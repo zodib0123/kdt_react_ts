@@ -1,3 +1,4 @@
+
 const BTStyle = {
   blue : {
     base : "bg-blue-500",
@@ -11,9 +12,18 @@ const BTStyle = {
     base : "bg-lime-500",
     hover : "hover:bg-lime-900",
   }
+} as const;
+
+type BTColor = keyof typeof BTStyle;
+// type BTColor = 'blue' | 'orange' | 'lime';
+
+interface TailButtonProps {
+  color: BTColor,
+  caption : string,
+  onHandle : () => void,
 }
 
-export default function TailButton({color, caption, onHandle}) {
+export default function TailButton({color, caption, onHandle} : TailButtonProps) {
   const btstyle = BTStyle[color] ;
 
   return (

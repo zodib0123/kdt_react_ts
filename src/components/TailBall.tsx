@@ -4,9 +4,12 @@ const BALLCOLOR = [
   "bg-yellow-500",
   "bg-green-500", 
   "bg-blue-500",
-]
+] as const ;
 
-export default function TailBall({n}) {
+interface TailballProps {
+  n : number
+}
+export default function TailBall({n} : TailballProps) {
   return (
     <div className={`w-20 h-20 rounded-full 
                     text-xl font-bold
