@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import TailCard from "../components/TailCard"
 import { Link , useSearchParams } from "react-router-dom";
+import type { FestivalType } from "./FestivalType";
 
-interface FestivalData {
-  [key : string] : string
-}
 export default function Festival() {
-  const [tdata, setTdata] = useState<FestivalData[]>([]) ;
+  const [tdata, setTdata] = useState<FestivalType[]>([]) ;
   const [area, setArea] = useState<React.ReactNode[]>([]) ;
-  const [areaFestival, setAreaFestival] = useState<FestivalData[]>([]) ;
+  const [areaFestival, setAreaFestival] = useState<FestivalType[]>([]) ;
   const [gu, setGu] = useState<string | null>() ;
 
   const selRef = useRef<HTMLSelectElement | null>(null); 
@@ -45,10 +43,12 @@ export default function Festival() {
   useEffect(() => {
     // console.log(selRef.current.value)
     if (!sParams.get("gu") || !selRef.current) return;
-    if (sParams.get("gu") != "") {
-      console.log(sParams.get("gu"))
-      selRef.current.value = sParams.get("gu") ?? "" ;
-      setGu(sParams.get("gu"));
+
+    const gu = sParams.get("gu");
+    if (gu) {
+      //console.log(sParams.get("gu"))
+      selRef.current.value = gu;
+      setGu(gu);
       handleChange();
     }
     else {

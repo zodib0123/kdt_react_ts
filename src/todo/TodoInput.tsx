@@ -1,45 +1,42 @@
 import TailButton from "../components/TailButton"
-import { useRef } from "react";
-import { supabase } from "../supabase/client";
+import { useEffect, useRef } from "react";
+import type { todoDataType } from "./TodoDataType";
 
-export default function TodoInput({ getTodos }) {
-  const inRef = useRef();
+interface TodoInputProps {
+    todos : todoDataType[]
+    setTodos : (newItem:todoDataType[]) => void
+}
+export default function TodoInput({todos, setTodos} : TodoInputProps) {
 
-  const handleAdd = async () => {
-    if (inRef.current.value == "") {
-      alert("값을 입력해 주세요.");
-      inRef.current.focus();
-      return
+    const inRef = useRef<HTMLInputElement>(null);
+    const handleAdd = () => {
+        if (!inRef.current) return;
+        if (inRef.current.value == "") {
+            alert("값을 입력해주세요.");
+            inRef.current.focus();
+            return ;
+        }
+
+        const newItem = {
+            id : Date.now(),
+            text : inRef.current.value,
+            completed : false
+        }
+        setTodos([newItem, ...todos]);
+        inRef.current.value = "";
+        inRef.current.focus();
     }
 
-    const { data, error } = await supabase
-      .from('todos')
-      .insert([
-        { text: inRef.current.value, completed: false },
-      ]);
-    if (error) {
-      console.error('Error adding todo:', error);
-    } else {
-      getTodos();
-      inRef.current.value = "";
-      inRef.current.focus();
-    }
-  }
+    useEffect(() => {
+        
+    }, [])
 
- 
-
-return (
-  <div className="w-full max-w-3xl flex justify-center items-center 
-                    my-4">
-    <input type="text"
-      ref={inRef}
-      className="flex-1 p-2 border border-gray-200
-                        rounded-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-600" />
-
-    <TailButton color="blue"
-      caption="추가"
-      onHandle={handleAdd} />
-  </div>
-)
+    return (
+        <div className="w-9/10 flex justify-center items-center p-5 bg-amber-100 rounded-xl">
+            <input className="flex-1 h-10 border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-sm"
+                    ref = {inRef}
+                    type="text" placeholder="새로운 할 일을 입력하세요." />
+            <TailButton color="blue" caption="추가" onHandle={handleAdd} />
+        </div>
+    )
 }

@@ -1,91 +1,65 @@
 import TailButton from "../components/TailButton"
 import { useState } from "react";
-import { supabase } from "../supabase/client";
+import type { todoDataType } from "./TodoDataType";
 
-export default function TodoItem({ todo, getTodos }) {
-  const [isEdit, setIsEdit] = useState(false);
-  const [editText, setEditText] = useState(todo.text);
+interface TotoItemProps {
+    todo : todoDataType,
+    todos : todoDataType[],
+    setTodos : (newItem:todoDataType[]) => void
+}
+export default function TodoItem({todo, todos, setTodos} : TotoItemProps) {
+    
+    const [isEdit, setIsEdit] = useState(false);
+    const [editText, setEditText] = useState(todo.text);
 
-  const handleToggle = async () => {
-    const { error } = await supabase
-      .from('todos')
-      .update({ completed: !todo.completed })
-      .eq('id', todo.id);
-    if (error) {
-      console.error('Error toggling todo:', error);
-    } else {
-      getTodos();
+    const handleToggle = () => {
+        setTodos(
+            todos.map( t => t.id == todo.id ? { ...t, completed : !todo.completed } : t)
+        );   
     }
-  }
 
-  const handleSave = async () => {
-    const { error } = await supabase
-      .from('todos')
-      .update({ text: editText })
-      .eq('id', todo.id);
-    if (error) {
-      console.error('Error toggling todo:', error);
-    } else {
-      getTodos();
-      setIsEdit(false);
+    const handleSave = () => {
+        setTodos(
+            todos.map( t => t.id == todo.id ? { ...t, text : editText } : t)
+        );
+        setIsEdit(false);
     }
-  }
 
-  const handleCancel = () => {
-    setIsEdit(false);
-    setEditText(todo.text);
-  }
-
-  const handleDelete = async () => {
-    const { error } = await supabase
-      .from('todos')
-      .delete()
-      .eq('id', todo.id);
-    if (error) {
-      console.error('Error deleting todo:', error);
-    } else {
-      getTodos();
+    const handleCancle = () => {
+        setEditText(todo.text);
+        setIsEdit(false);
     }
-  }
 
-  return (
-    <div className="w-full max-w-3xl flex justify-center items-center 
-                    my-4">
-      <input type="checkbox"
-        className="w-5 h-5 cursor-pointer"
-        checked={todo.completed}
-        onChange={handleToggle} />
+    const handleDelete = () => {
+        setTodos(
+            todos.filter( t => t.id != todo.id)
+        );
+    }
 
-      {isEdit ? <input type="text"
-        value={editText}
-        onChange={(e) => setEditText(e.target.value)}
-        className="flex-1 p-2 mx-2 border border-gray-200
-                        rounded-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-600"
-      />
-        : <span className={`flex-1 p-2 ${todo.completed ? "line-through" : ""}`}>
-          {todo.text}
-        </span>
-      }
-      {
-        isEdit ? <>
-          <TailButton color="lime"
-            caption="저장"
-            onHandle={handleSave} />
-          <TailButton color="orange"
-            caption="취소"
-            onHandle={handleCancel} />
-        </>
-          : <>
-            <TailButton color="lime"
-              caption="수정"
-              onHandle={() => setIsEdit(true)} />
-            <TailButton color="orange"
-              caption="삭제"
-              onHandle={handleDelete} />
-          </>
-      }
-
-    </div>
-  )
+    return (
+        <div className="w-full flex p-5 items-center">
+            <div className="w-8/10 flex flex-1 text-lg">
+                <input className="justify-start items-start"
+                        type="checkbox" name="todo" checked={todo.completed}
+                        onChange={handleToggle}  />
+                { isEdit ? <input type="text"
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  className="ml-5 flex-1 border border-gray-600 px-4 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-sm"
+                           />
+                         : <span className="ml-5">{editText}</span>
+                }                
+            </div>
+            {
+                isEdit ? <>
+                            <TailButton color="lime" caption="저장" onHandle={handleSave} />
+                            <TailButton color="orange" caption="취소" onHandle={handleCancle} />   
+                         </>
+                       : <>
+                            <TailButton color="lime" caption="수정" onHandle={() => setIsEdit(true)} />
+                            <TailButton color="orange" caption="삭제" onHandle={handleDelete} />
+                         </>
+            }
+        </div>
+    )
 }

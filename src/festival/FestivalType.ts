@@ -1,3 +1,6 @@
+// export interface FestivalData {
+//   [key : string] : string | number
+// }
 export interface FestivalType {
     ADDR1 : string,
     ADDR2 : string,
